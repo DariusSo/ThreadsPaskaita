@@ -1,15 +1,23 @@
 package org.example;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
     private static AtomicBoolean winner = new AtomicBoolean(false);
     private static AtomicBoolean flag = new AtomicBoolean(false);
-    public static final ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock(true);
-    public static final Lock readLock = reentrantReadWriteLock.readLock();
-    public static final Lock writeLock = reentrantReadWriteLock.writeLock();
+
+    public static final ReentrantLock justLock = new ReentrantLock();
+
+    public static final Condition areYouReadyToRead = justLock.newCondition();
+
+    public static CountDownLatch isEveryoneFinished = new CountDownLatch(3);
+
+    public static AtomicInteger wordCount = new AtomicInteger(0);
+
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -68,13 +76,30 @@ public class Main {
 //        threadR4.start();
         ////////////////////////////////________WRITER/READER__________\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        Thread threadRead1 = new Thread(new Reader(flag));
-        threadRead1.start();
-        Thread.sleep(2000);
-        Thread threadWrite1 = new Thread(new Writer(flag));
-        threadWrite1.start();
-        Thread.sleep(1000);
-        Thread threadWrite2 = new Thread(new Writer(flag));
-        threadWrite2.start();
+//        Thread threadRead1 = new Thread(new Reader(flag), "Reader 1");
+//        threadRead1.start();
+//        Thread threadRead2 = new Thread(new Reader(flag), "Reader 2");
+//        threadRead2.start();
+//        Thread.sleep(2000);
+//
+//        Thread threadWrite1 = new Thread(new Writer(flag), "Writer 1");
+//        threadWrite1.start();
+//
+//        Thread threadWrite2 = new Thread(new Writer(flag), "Writer 2");
+//        threadWrite2.start();
+
+        ////////////////////////////////________WORD SEARCH__________\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+        Thread threadWords1 = new Thread(new WordReader("teisingasZodis", "C:\\Users\\Darius\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\words.txt"));
+        threadWords1.start();
+        Thread threadWords2 = new Thread(new WordReader("teisingasZodis", "C:\\Users\\Darius\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\words2.txt"));
+        threadWords2.start();
+        Thread threadWords3 = new Thread(new WordReader("teisingasZodis", "C:\\Users\\Darius\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\words3.txt"));
+        threadWords3.start();
+
+
+        Thread threatWordsCount = new Thread(new MainThreadWords(), "Main");
+        threatWordsCount.start();
+
     }
 }

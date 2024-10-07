@@ -26,20 +26,20 @@ public class Reader implements Runnable{
 
         try {
 
-            fileReader = new FileReader("C:\\Users\\jurat\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\text.txt");
+            fileReader = new FileReader("C:\\Users\\Darius\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\text.txt");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            reentrantReadWriteLock.readLock().lock();
+            //reentrantReadWriteLock.readLock().lock();
             for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
-//                if(!reentrantReadWriteLock.isWriteLocked())
 
-                    System.out.println(Thread.currentThread().getName() + ": " + line);
-                    Thread.sleep(500);
+                justLock.lock();
+                if(flag.get()){
+                    areYouReadyToRead.await();
+                }
+                justLock.unlock();
+                System.out.println(Thread.currentThread().getName() + ": " + line);
+                Thread.sleep(500);
 
             }
-            reentrantReadWriteLock.readLock().unlock();
-
-
-            //System.out.println(bufferedReader.readLine());
 
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

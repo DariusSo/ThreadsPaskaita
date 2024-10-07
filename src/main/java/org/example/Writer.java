@@ -21,20 +21,22 @@ public class Writer implements Runnable{
     public void run() {
         try {
 
-            FileWriter fileWriter = new FileWriter("C:\\Users\\jurat\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\text.txt", true);
+            FileWriter fileWriter = new FileWriter("C:\\Users\\Darius\\IdeaProjects\\ThreadsPaskaita\\src\\main\\java\\org\\example\\text.txt", true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-
             flag.set(true);
-            reentrantReadWriteLock.writeLock().lock();
+
+            justLock.lock();
             for(int i = 0; i < 5; i++){
                 bufferedWriter.write("rasau");
                 System.out.println(Thread.currentThread().getName() + ": rasau");
                 Thread.sleep(500);
 
             }
-            reentrantReadWriteLock.writeLock().unlock();
             flag.set(false);
+            areYouReadyToRead.signalAll();
+            justLock.unlock();
+
 
 
 
