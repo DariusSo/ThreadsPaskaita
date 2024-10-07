@@ -1,9 +1,16 @@
 package org.example;
 
-import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Main {
-    static boolean flag = false;
+    private static AtomicBoolean winner = new AtomicBoolean(false);
+    private static AtomicBoolean flag = new AtomicBoolean(false);
+    public static final ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock(true);
+    public static final Lock readLock = reentrantReadWriteLock.readLock();
+    public static final Lock writeLock = reentrantReadWriteLock.writeLock();
+
     public static void main(String[] args) throws InterruptedException {
 
 //        Thread thread1 = new Thread(new CapitalRandomLetter(), "Thread");
@@ -49,30 +56,25 @@ public class Main {
 //            j++;
 //        }
         ////////////////////////////////________THREAD RACE__________\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        int k = 0;
 
-        while(k != 4){
-            try{
-                Thread threadWhile = new Thread(new ThreadRace(), "Thread" + k);
-                threadWhile.start();
-                k++;
-            }catch (Exception e){
-                break;
-            }
-
-        }
-
-//        Thread threadRace1 = new Thread(new ThreadRace(), "Thread" + 1);
-//        Thread threadRace2 = new Thread(new ThreadRace(), "Thread" + 2);
-//        Thread threadRace3 = new Thread(new ThreadRace(), "Thread" + 3);
-//        Thread threadRace4 = new Thread(new ThreadRace(), "Thread" + 4);
+//        Thread threadR1 = new Thread(new ThreadRace(winner));
+//        Thread threadR2 = new Thread(new ThreadRace(winner));
+//        Thread threadR3 = new Thread(new ThreadRace(winner));
+//        Thread threadR4 = new Thread(new ThreadRace(winner));
 //
-//
-//        threadRace1.start();
-//        threadRace2.start();
-//        threadRace3.start();
-//        threadRace4.start();
+//        threadR1.start();
+//        threadR2.start();
+//        threadR3.start();
+//        threadR4.start();
+        ////////////////////////////////________WRITER/READER__________\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-
+        Thread threadRead1 = new Thread(new Reader(flag));
+        threadRead1.start();
+        Thread.sleep(2000);
+        Thread threadWrite1 = new Thread(new Writer(flag));
+        threadWrite1.start();
+        Thread.sleep(1000);
+        Thread threadWrite2 = new Thread(new Writer(flag));
+        threadWrite2.start();
     }
 }
